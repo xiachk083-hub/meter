@@ -1,0 +1,11 @@
+{"ts":1763213421050,"type":"create_user","data":{"id":1,"username":"xiach"},"userId":1}
+{"ts":1763213497092,"type":"create_user","data":{"id":2,"username":"xaich"},"userId":2}
+{"ts":1763214303039,"type":"create_category","data":{"id":2,"name":"测试"},"userId":1}
+{"ts":1763214306144,"type":"create_account","data":{"id":2,"categoryId":2,"name":"测试"},"userId":1}
+{"ts":1763214308247,"type":"start_session","data":{"id":2,"categoryId":2,"accountId":2,"hourlyRate":16.4,"start_time":1763214308246},"userId":1}
+{"ts":1763214312852,"type":"stop_session","data":{"id":2,"end_time":1763214312852,"total_ms":4606,"total_amount":0.020982888888888888}}
+{"ts":1763214719715,"type":"start_session","data":{"id":3,"categoryId":2,"accountId":2,"hourlyRate":16.4,"start_time":1763214719715},"userId":1}
+{"ts":1763214721977,"type":"stop_session","data":{"id":3,"end_time":1763214721976,"total_ms":2261,"total_amount":0.01030011111111111}}
+{"ts":1763215649358,"type":"start_session","data":{"id":4,"categoryId":2,"accountId":2,"hourlyRate":16.4,"start_time":1763215649358},"userId":1}
+{"ts":1763215651792,"type":"stop_session","data":{"id":4,"end_time":1763215651792,"total_ms":2434,"total_amount":0.011088222222222222}}
+{"ts":1763216447870,"type":"batch_delete_sessions","data":{"ids":[4,3,2],"deleted":3},"userId":1}
