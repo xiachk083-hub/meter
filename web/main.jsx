@@ -4,19 +4,19 @@ import Chart from 'chart.js/auto'
 
 const api = {
   me: () => fetch('/api/auth/me', { credentials: 'include' }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!r.ok || !ct.includes('application/json')) return null; return r.json() }),
-  login: (username) => fetch('/api/auth/login', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username }) }).then(r => r.json()),
-  register: (username) => fetch('/api/auth/register', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username }) }).then(r => r.json()),
-  logout: () => fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).then(r => r.json()),
+  login: (username) => fetch('/api/auth/login', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username }) }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '登录失败'); return j }),
+  register: (username) => fetch('/api/auth/register', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username }) }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '注册失败'); return j }),
+  logout: () => fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '退出失败'); return j }),
   getCategories: () => fetch('/api/categories', { credentials: 'include' }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) return []; const j = await r.json(); return Array.isArray(j) ? j : [] }),
-  addCategory: (name) => fetch('/api/categories', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) }).then(r => r.json()),
+  addCategory: (name) => fetch('/api/categories', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '创建分类失败'); return j }),
   getAccounts: (categoryId) => fetch(`/api/accounts?categoryId=${categoryId}`, { credentials: 'include' }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) return []; const j = await r.json(); return Array.isArray(j) ? j : [] }),
-  addAccount: (categoryId, name) => fetch('/api/accounts', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ categoryId, name }) }).then(r => r.json()),
-  startSession: (categoryId, accountId, hourlyRate) => fetch('/api/sessions/start', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ categoryId, accountId, hourlyRate }) }).then(r => r.json()),
-  pauseSession: (sessionId) => fetch('/api/sessions/pause', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) }).then(r => r.json()),
-  resumeSession: (sessionId) => fetch('/api/sessions/resume', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) }).then(r => r.json()),
-  stopSession: (sessionId) => fetch('/api/sessions/stop', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) }).then(r => r.json()),
-  sessionStatus: (sessionId) => fetch(`/api/sessions/${sessionId}/status`, { credentials: 'include' }).then(r => r.json()),
-  categoryRecommendation: (id) => fetch(`/api/categories/${id}/recommendation`, { credentials: 'include' }).then(r => r.json()),
+  addAccount: (categoryId, name) => fetch('/api/accounts', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ categoryId, name }) }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '创建账号失败'); return j }),
+  startSession: (categoryId, accountId, hourlyRate) => fetch('/api/sessions/start', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ categoryId, accountId, hourlyRate }) }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '开始失败'); return j }),
+  pauseSession: (sessionId) => fetch('/api/sessions/pause', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '暂停失败'); return j }),
+  resumeSession: (sessionId) => fetch('/api/sessions/resume', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '继续失败'); return j }),
+  stopSession: (sessionId) => fetch('/api/sessions/stop', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '结束失败'); return j }),
+  sessionStatus: (sessionId) => fetch(`/api/sessions/${sessionId}/status`, { credentials: 'include' }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '加载失败'); return j }),
+  categoryRecommendation: (id) => fetch(`/api/categories/${id}/recommendation`, { credentials: 'include' }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); if (!r.ok) throw new Error(j.error || '加载失败'); return j }),
   listSessions: ({ categoryId, accountId, status, scope }) => {
     const p = new URLSearchParams()
     if (categoryId) p.set('categoryId', categoryId)
@@ -77,8 +77,8 @@ function App() {
   const [health, setHealth] = useState({ configured: false, reachable: false, missing: [], lastError: '' })
 
   useEffect(() => { api.me().then(u => u && setUser(u)) }, [])
-  useEffect(() => { if (user) fetch('/api/sync/status', { credentials: 'include' }).then(r => r.json()).then(s => { setSyncStatus(s); setIntervalMs(s.intervalMs || 300000) }) }, [user])
-  useEffect(() => { if (user) fetch('/api/sync/health', { credentials: 'include' }).then(r => r.json()).then(setHealth) }, [user])
+  useEffect(() => { if (user) fetch('/api/sync/status', { credentials: 'include' }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); return j }).then(s => { setSyncStatus(s); setIntervalMs(s.intervalMs || 300000) }).catch(() => {}) }, [user])
+  useEffect(() => { if (user) fetch('/api/sync/health', { credentials: 'include' }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); return j }).then(setHealth).catch(() => {}) }, [user])
   useEffect(() => { if (user) api.getCategories().then(setCategories) }, [user])
   useEffect(() => { if (!targetCategoryId) { setTargetAccounts([]); setTargetAccountId(''); return } api.getAccounts(targetCategoryId).then(setTargetAccounts) }, [targetCategoryId])
   useEffect(() => {
@@ -103,7 +103,7 @@ function App() {
     const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim()
     const border = getComputedStyle(document.body).getPropertyValue('--border').trim()
     if (activeTab === 'trend') {
-      fetch(`/api/stats/series?${params}`).then(r => r.json()).then(series => {
+      fetch(`/api/stats/series?${params}`).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); return j }).then(series => {
         const labels = series.map(x => new Date(x.t).toLocaleDateString())
         const values = series.map(x => x.totalAmount)
         if (navChartInstance.current) navChartInstance.current.destroy()
@@ -112,7 +112,7 @@ function App() {
       })
     } else if (activeTab === 'distribution') {
       const params2 = new URLSearchParams(params); params2.set('field', 'total_amount'); params2.set('bins', '12')
-      fetch(`/api/stats/distribution?${params2}`).then(r => r.json()).then(dist => {
+      fetch(`/api/stats/distribution?${params2}`).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); return j }).then(dist => {
         const labels = dist.bins.map(b => `${Math.round(b.from)}-${Math.round(b.to)}`)
         const values = dist.bins.map(b => b.count)
         if (navChartInstance.current) navChartInstance.current.destroy()
@@ -121,7 +121,7 @@ function App() {
       })
     } else {
       const params3 = new URLSearchParams(params); params3.set('by', 'account')
-      fetch(`/api/stats/pie?${params3}`).then(r => r.json()).then(p => {
+      fetch(`/api/stats/pie?${params3}`).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) throw new Error(await r.text()); const j = await r.json(); return j }).then(p => {
         const labels = p.map(x => x.key)
         const values = p.map(x => x.value)
         if (navChartInstance.current) navChartInstance.current.destroy()

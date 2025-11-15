@@ -3,7 +3,7 @@
   "appName": "计时计费工具",
   "webDir": "public",
   "server": {
-    "url": "https://traemeterxj8o.vercel.app",
+    "url": "https://traemerxj8o.vercel.app",
     "cleartext": false
   }
 }
