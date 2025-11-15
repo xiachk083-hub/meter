@@ -25,6 +25,9 @@ jobs:
             npm install
           fi
 
+      - name: Build web bundle
+        run: npm run build:web
+
       - name: Ensure Capacitor CLI & Android
         run: |
           npm install --no-audit --no-fund --no-save @capacitor/cli@^7 @capacitor/android@^7.4.4

@@ -14,13 +14,22 @@
   },
   "devDependencies": {
     "pkg": "^5.8.1",
-    "@capacitor/cli": "^7.4.0"
+    "@capacitor/cli": "^7.4.0",
+    "esbuild": "^0.21.5"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "xlsx": "^0.18.5",
     "@capacitor/core": "^7.4.0",
-    "@capacitor/android": "^7.4.4"
+    "@capacitor/android": "^7.4.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "chart.js": "^4.4.1"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "build:web": "node scripts/build-web.mjs",
+    "watch:web": "node scripts/build-web.mjs --watch"
   }
 }
