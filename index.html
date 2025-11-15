@@ -229,9 +229,9 @@
       login: (username) => fetch('/api/auth/login', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username }) }).then(r => r.json()),
       register: (username) => fetch('/api/auth/register', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username }) }).then(r => r.json()),
       logout: () => fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).then(r => r.json()),
-      getCategories: () => fetch('/api/categories', { credentials: 'include' }).then(r => r.json()),
+      getCategories: () => fetch('/api/categories', { credentials: 'include' }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) return []; const j = await r.json(); return Array.isArray(j) ? j : [] }),
       addCategory: (name) => fetch('/api/categories', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) }).then(r => r.json()),
-      getAccounts: (categoryId) => fetch(`/api/accounts?categoryId=${categoryId}`, { credentials: 'include' }).then(r => r.json()),
+      getAccounts: (categoryId) => fetch(`/api/accounts?categoryId=${categoryId}`, { credentials: 'include' }).then(async r => { const ct = r.headers.get('content-type') || ''; if (!ct.includes('application/json')) return []; const j = await r.json(); return Array.isArray(j) ? j : [] }),
       addAccount: (categoryId, name) => fetch('/api/accounts', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ categoryId, name }) }).then(r => r.json()),
       startSession: (categoryId, accountId, hourlyRate) => fetch('/api/sessions/start', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ categoryId, accountId, hourlyRate }) }).then(r => r.json()),
       pauseSession: (sessionId) => fetch('/api/sessions/pause', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) }).then(r => r.json()),
@@ -516,14 +516,14 @@
                       <span>目标分类</span>
                       <select className="select" value={targetCategoryId} onChange={e => setTargetCategoryId(e.target.value)}>
                         <option value="">请选择</option>
-                        {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        {(Array.isArray(categories) ? categories : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                       </select>
                     </label>
                     <label>
                       <span>目标账号</span>
                       <select className="select" value={targetAccountId} onChange={e => setTargetAccountId(e.target.value)}>
                         <option value="">请选择</option>
-                        {targetAccounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                        {(Array.isArray(targetAccounts) ? targetAccounts : []).map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                       </select>
                     </label>
                     <button disabled={!selectedIds.length || (!targetCategoryId && !targetAccountId)} onClick={() => {
@@ -570,7 +570,7 @@
                 <span>选择分类</span>
                 <select value={categoryId} onChange={e => setCategoryId(e.target.value)}>
                   <option value="">请选择</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {(Array.isArray(categories) ? categories : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </label>
               <label>
@@ -586,7 +586,7 @@
                 <span>选择账号</span>
                 <select value={accountId} onChange={e => setAccountId(e.target.value)}>
                   <option value="">请选择</option>
-                  {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                  {(Array.isArray(accounts) ? accounts : []).map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                 </select>
               </label>
               <label>
