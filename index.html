@@ -226,7 +226,7 @@
   <div id="root"></div>
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React
-      const api = {
+    const api = {
       me: () => fetch('/api/auth/me', { credentials: 'include' }).then(r => r.ok ? r.json() : null),
       login: (username) => fetch('/api/auth/login', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username }) }).then(r => r.json()),
       register: (username) => fetch('/api/auth/register', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username }) }).then(r => r.json()),
@@ -264,7 +264,7 @@
         if (!ct.includes('application/json')) throw new Error(await r.text())
         const j = await r.json(); if (!r.ok) throw new Error(j.error || '删除失败'); return j
       }),
-      }
+    }
 
     function formatMs(ms) {
       const s = Math.floor(ms / 1000)
@@ -447,7 +447,7 @@
                     api.listSessions({ categoryId, accountId, status: 'stopped', scope }).then(setManageSessions).catch(e => setManageMsg(String(e.message || e))).finally(() => setManageLoading(false))
                   }
                 }}>{manageOpen ? '关闭数据管理' : '数据管理'}</button>
-                
+
                 <select className="select" value={exportFormat} onChange={e => setExportFormat(e.target.value)}>
                   <option value="csv">CSV</option>
                   <option value="xlsx">Excel</option>
