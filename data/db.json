@@ -1,7 +1,102 @@
 {
-  "users": [],
-  "categories": [],
-  "accounts": [],
-  "sessions": [],
-  "user_ops": []
+  "users": [
+    {
+      "id": 1,
+      "username": "xiach",
+      "created_at": 1763230329252
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "name": "11"
+    }
+  ],
+  "accounts": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "category_id": 1,
+      "name": "11"
+    }
+  ],
+  "sessions": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "category_id": 1,
+      "account_id": 1,
+      "hourly_rate": 16.4,
+      "start_time": 1763230518308,
+      "end_time": 1763230521385,
+      "total_ms": 3077,
+      "total_amount": 0.014017444444444443,
+      "status": "stopped",
+      "segments": [
+        {
+          "start_time": 1763230518308,
+          "end_time": 1763230521385
+        }
+      ]
+    }
+  ],
+  "user_ops": [
+    {
+      "id": 1,
+      "ts": 1763230329263,
+      "user_id": 1,
+      "type": "create_user",
+      "data": {
+        "id": 1,
+        "username": "xiach"
+      }
+    },
+    {
+      "id": 2,
+      "ts": 1763230508777,
+      "user_id": 1,
+      "type": "create_category",
+      "data": {
+        "id": 1,
+        "name": "11"
+      }
+    },
+    {
+      "id": 3,
+      "ts": 1763230515417,
+      "user_id": 1,
+      "type": "create_account",
+      "data": {
+        "id": 1,
+        "categoryId": 1,
+        "name": "11"
+      }
+    },
+    {
+      "id": 4,
+      "ts": 1763230518317,
+      "user_id": 1,
+      "type": "start_session",
+      "data": {
+        "id": 1,
+        "categoryId": 1,
+        "accountId": 1,
+        "hourlyRate": 16.4,
+        "start_time": 1763230518308
+      }
+    },
+    {
+      "id": 5,
+      "ts": 1763230521395,
+      "user_id": null,
+      "type": "stop_session",
+      "data": {
+        "id": 1,
+        "end_time": 1763230521385,
+        "total_ms": 3077,
+        "total_amount": 0.014017444444444443
+      }
+    }
+  ]
 }

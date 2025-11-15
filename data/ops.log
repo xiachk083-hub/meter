@@ -1,0 +1,5 @@
+{"ts":1763230329253,"type":"create_user","data":{"id":1,"username":"xiach"},"userId":1}
+{"ts":1763230508768,"type":"create_category","data":{"id":1,"name":"11"},"userId":1}
+{"ts":1763230515409,"type":"create_account","data":{"id":1,"categoryId":1,"name":"11"},"userId":1}
+{"ts":1763230518309,"type":"start_session","data":{"id":1,"categoryId":1,"accountId":1,"hourlyRate":16.4,"start_time":1763230518308},"userId":1}
+{"ts":1763230521386,"type":"stop_session","data":{"id":1,"end_time":1763230521385,"total_ms":3077,"total_amount":0.014017444444444443}}
