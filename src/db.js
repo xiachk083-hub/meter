@@ -1,17 +1,21 @@
 import fs from 'fs'
 import path from 'path'
 
-const baseDir = (global.process && global.process.pkg) ? path.dirname(process.execPath) : process.cwd()
+const baseDir = process.env.VERCEL ? '/tmp' : ((global.process && global.process.pkg) ? path.dirname(process.execPath) : process.cwd())
 const dataDir = path.resolve(baseDir, 'data')
 const dbPath = path.join(dataDir, 'db.json')
 const logPath = path.join(dataDir, 'ops.log')
 const secretPath = path.join(dataDir, 'secret.json')
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
-if (!fs.existsSync(dbPath)) fs.writeFileSync(dbPath, JSON.stringify({ users: [], categories: [], accounts: [], sessions: [], user_ops: [] }, null, 2))
-if (!fs.existsSync(logPath)) fs.writeFileSync(logPath, '')
-if (!fs.existsSync(secretPath)) fs.writeFileSync(secretPath, JSON.stringify({ secret: Math.random().toString(36).slice(2) }))
+
+function ensureFiles() {
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
+  if (!fs.existsSync(dbPath)) fs.writeFileSync(dbPath, JSON.stringify({ users: [], categories: [], accounts: [], sessions: [], user_ops: [] }, null, 2))
+  if (!fs.existsSync(logPath)) fs.writeFileSync(logPath, '')
+  if (!fs.existsSync(secretPath)) fs.writeFileSync(secretPath, JSON.stringify({ secret: Math.random().toString(36).slice(2) }))
+}
 
 function read() {
+  ensureFiles()
   const obj = JSON.parse(fs.readFileSync(dbPath, 'utf-8'))
   if (!obj.users) obj.users = []
   if (!obj.categories) obj.categories = []
@@ -25,6 +29,7 @@ function read() {
 }
 
 function write(data) {
+  ensureFiles()
   fs.writeFileSync(dbPath, JSON.stringify(data, null, 2))
 }
 
@@ -177,6 +182,7 @@ export function recommendationForCategory(categoryId) {
 }
 
 function log(entry) {
+  ensureFiles()
   const line = JSON.stringify({ ts: Date.now(), ...entry }) + '\n'
   fs.appendFileSync(logPath, line)
   const db = read()
@@ -421,6 +427,7 @@ export function globalSummaryStats() {
 }
 
 export function readSecret() {
+  ensureFiles()
   const obj = JSON.parse(fs.readFileSync(secretPath, 'utf-8'))
   return obj.secret
 }
