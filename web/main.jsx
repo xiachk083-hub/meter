@@ -74,9 +74,11 @@ function App() {
   const [syncStatus, setSyncStatus] = useState({ enabled: false, intervalMs: 300000, lastSaveAt: 0, lastPullAt: 0, running: false, progress: '', logs: [] })
   const [intervalMs, setIntervalMs] = useState(300000)
   const [syncMsg, setSyncMsg] = useState('')
+  const [health, setHealth] = useState({ configured: false, reachable: false, missing: [], lastError: '' })
 
   useEffect(() => { api.me().then(u => u && setUser(u)) }, [])
   useEffect(() => { if (user) fetch('/api/sync/status', { credentials: 'include' }).then(r => r.json()).then(s => { setSyncStatus(s); setIntervalMs(s.intervalMs || 300000) }) }, [user])
+  useEffect(() => { if (user) fetch('/api/sync/health', { credentials: 'include' }).then(r => r.json()).then(setHealth) }, [user])
   useEffect(() => { if (user) api.getCategories().then(setCategories) }, [user])
   useEffect(() => { if (!targetCategoryId) { setTargetAccounts([]); setTargetAccountId(''); return } api.getAccounts(targetCategoryId).then(setTargetAccounts) }, [targetCategoryId])
   useEffect(() => {
@@ -258,6 +260,12 @@ function App() {
                 {(syncStatus.logs || []).slice().reverse().map((l, i) => (
                   <div key={i} style={{ fontSize: 12 }}>{new Date(l.t).toLocaleString()} {l.msg}</div>
                 ))}
+              </div>
+              <div style={{ borderTop: '1px dashed var(--border)', marginTop: 8, paddingTop: 8, fontSize: 12 }}>
+                <div>云端配置：{health.configured ? '已配置' : '未配置'}</div>
+                <div>连接：{health.reachable ? '正常' : '失败'}</div>
+                {health.missing && health.missing.length > 0 && <div>缺少表：{health.missing.join(', ')}</div>}
+                {health.lastError && <div style={{ color: 'crimson' }}>{health.lastError}</div>}
               </div>
             </div>
           </div>

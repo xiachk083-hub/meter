@@ -112,3 +112,17 @@ function restartTimer() {
 }
 
 restartTimer()
+
+export async function checkHealth() {
+  const required = ['users', 'categories', 'accounts', 'sessions', 'user_ops']
+  const result = { configured: !!client, reachable: false, missing: [], lastError: '' }
+  if (!client) return result
+  try {
+    result.reachable = true
+    for (const t of required) {
+      const { error } = await client.from(t).select('*').limit(1)
+      if (error) { result.missing.push(t); result.lastError = String(error.message || error) }
+    }
+    return result
+  } catch (e) { result.lastError = String(e.message || e); return result }
+}

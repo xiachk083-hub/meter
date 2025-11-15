@@ -33,7 +33,7 @@ import {
 } from './db.js'
 import crypto from 'crypto'
 import xlsx from 'xlsx'
-import { getStatus as getSyncStatus, setConfig as setSyncConfig, saveAll as saveCloud, pullAll as pullCloud, queueChange } from './cloud.js'
+import { getStatus as getSyncStatus, setConfig as setSyncConfig, saveAll as saveCloud, pullAll as pullCloud, queueChange, checkHealth } from './cloud.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -357,6 +357,10 @@ app.post('/api/sync/save', requireAuth, async (req, res) => {
 
 app.post('/api/sync/pull', requireAuth, async (req, res) => {
   try { await pullCloud(); res.json(getSyncStatus()) } catch (e) { res.status(500).json({ error: String(e.message || e) }) }
+})
+
+app.get('/api/sync/health', requireAuth, async (req, res) => {
+  try { const h = await checkHealth(); res.json(h) } catch (e) { res.status(500).json({ error: String(e.message || e) }) }
 })
 
 function firstExisting(paths) {
