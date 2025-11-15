@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import path from 'path'
+import fs from 'fs'
 import { fileURLToPath } from 'url'
 import {
   createCategoryForUser,
@@ -330,12 +331,28 @@ app.post('/api/sessions/batch/delete', requireAuth, (req, res) => {
   res.json(r)
 })
 
-const staticDir = (global.process && global.process.pkg) ? path.join(path.dirname(process.execPath), 'public') : path.resolve(__dirname, '../public')
-app.use(express.static(staticDir))
+function firstExisting(paths) {
+  for (const p of paths) {
+    if (!p) continue
+    try { if (fs.existsSync(p)) return p } catch {}
+  }
+  return null
+}
+
+const pkgPublic = (global.process && global.process.pkg) ? path.join(path.dirname(process.execPath), 'public') : null
+const publicDir = path.resolve(__dirname, '../public')
+const rootIndex = path.resolve(__dirname, '../index.html')
+const staticDir = firstExisting([publicDir, pkgPublic])
+if (staticDir) app.use(express.static(staticDir))
 
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api/')) return next()
-  res.sendFile(path.join(staticDir, 'index.html'))
+  const indexPath = firstExisting([
+    staticDir ? path.join(staticDir, 'index.html') : null,
+    rootIndex
+  ])
+  if (indexPath) return res.sendFile(indexPath)
+  res.status(404).send('Not Found')
 })
 
 export default app
