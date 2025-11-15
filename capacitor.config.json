@@ -1,7 +1,7 @@
 {
   "appId": "com.meter.app",
   "appName": "计时计费工具",
-  "webDir": ".",
+  "webDir": "public",
   "server": {
     "url": "https://traemeterxj8o.vercel.app",
     "cleartext": false
