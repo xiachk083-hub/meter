@@ -5,6 +5,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>计时计费工具</title>
+  <meta name="theme-color" content="#1976d2" />
+  <link rel="manifest" href="/manifest.json" />
   <link rel="preconnect" href="https://unpkg.com" />
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -660,6 +662,9 @@
     }
 
     ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js') }
   </script>
 </body>
 

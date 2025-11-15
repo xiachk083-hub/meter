@@ -1,0 +1,10 @@
+{
+  "name": "计时计费工具",
+  "short_name": "计时计费",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1976d2",
+  "lang": "zh-CN",
+  "icons": []
+}
