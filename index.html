@@ -577,7 +577,7 @@
                 <span>新建分类</span>
                 <div className="row">
                   <input value={newCategory} onChange={e => setNewCategory(e.target.value)} placeholder="分类名" />
-                  <button onClick={() => newCategory && api.addCategory(newCategory).then(() => { setNewCategory(''); api.getCategories().then(setCategories) })}>创建</button>
+                  <button onClick={() => newCategory && api.addCategory(newCategory).then(() => { setNewCategory(''); api.getCategories().then(setCategories) }).catch(e => alert(String(e.message || e)))}>创建</button>
                 </div>
               </label>
             </div>
@@ -593,7 +593,7 @@
                 <span>新建账号</span>
                 <div className="row">
                   <input value={newAccount} onChange={e => setNewAccount(e.target.value)} placeholder="账号名" />
-                  <button onClick={() => categoryId && newAccount && api.addAccount(Number(categoryId), newAccount).then(() => { setNewAccount(''); api.getAccounts(categoryId).then(setAccounts) })}>创建</button>
+                  <button onClick={() => categoryId && newAccount && api.addAccount(Number(categoryId), newAccount).then(() => { setNewAccount(''); api.getAccounts(categoryId).then(setAccounts) }).catch(e => alert(String(e.message || e)))}>创建</button>
                 </div>
               </label>
               <label>
