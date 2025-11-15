@@ -24,10 +24,10 @@ jobs:
         run: npm install @capacitor/android@^7.4.4
 
       - name: Add Android
-        run: npx --yes @capacitor/cli add android
+        run: npx capacitor add android
 
       - name: Sync Android
-        run: npx --yes @capacitor/cli sync android
+        run: npx capacitor sync android
 
       - name: Setup Java
         uses: actions/setup-java@v4
