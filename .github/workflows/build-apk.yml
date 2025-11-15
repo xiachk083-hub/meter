@@ -20,11 +20,17 @@ jobs:
       - name: Install deps
         run: npm ci || npm install
 
+      - name: Install Capacitor Android
+        run: npm install @capacitor/android@^7.4.4
+
       - name: Init Capacitor
         run: npx cap init meter com.meter.app --web-dir .
 
       - name: Add Android
         run: npx cap add android
+
+      - name: Sync Android
+        run: npx cap sync android
 
       - name: Setup Java
         uses: actions/setup-java@v4
