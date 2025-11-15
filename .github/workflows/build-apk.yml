@@ -18,16 +18,25 @@ jobs:
           node-version: 20
 
       - name: Install deps
-        run: npm ci || npm install
+        run: |
+          if npm ci; then
+            echo "npm ci succeeded"
+          else
+            npm install
+          fi
 
-      - name: Install Capacitor Android
-        run: npm install @capacitor/android@^7.4.4
+      - name: Ensure Capacitor CLI & Android
+        run: |
+          npm install --no-audit --no-fund --no-save @capacitor/cli@^7 @capacitor/android@^7.4.4
+
+      - name: Add node_modules bin to PATH
+        run: echo "$(npm bin)" >> $GITHUB_PATH
 
       - name: Add Android
-        run: npx capacitor add android
+        run: node ./node_modules/@capacitor/cli/bin/capacitor add android
 
       - name: Sync Android
-        run: npx capacitor sync android
+        run: node ./node_modules/@capacitor/cli/bin/capacitor sync android
 
       - name: Setup Java
         uses: actions/setup-java@v4
