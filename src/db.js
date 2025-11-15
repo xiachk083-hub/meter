@@ -427,6 +427,8 @@ export function globalSummaryStats() {
 }
 
 export function readSecret() {
+  const envSecret = process.env.APP_SECRET || process.env.SESSION_SECRET || process.env.SECRET
+  if (envSecret) return envSecret
   ensureFiles()
   const obj = JSON.parse(fs.readFileSync(secretPath, 'utf-8'))
   return obj.secret
