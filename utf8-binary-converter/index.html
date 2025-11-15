@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UTF-8 二进制转换工具</title>
+    <meta name="description" content="UTF-8 二进制转换，将文本转为二进制与十六进制">
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --panel: #0f1520;
+            --text: #e6edf3;
+            --muted: #9aa6b2;
+            --border: #1c2430;
+            --accent: #7aa2ff;
+            --accent-2: #9b59ff;
+            --btn: #121a27;
+            --btn-hover: #172131;
+            --shadow: 0 12px 32px rgba(0, 0, 0, .35)
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f2f5f8;
+                --panel: #ffffff;
+                --text: #0f172a;
+                --muted: #475569;
+                --border: #e2e8f0;
+                --accent: #2563eb;
+                --accent-2: #7c3aed;
+                --btn: #f8fafc;
+                --btn-hover: #eef2f7;
+                --shadow: 0 12px 28px rgba(16, 24, 40, .12)
+            }
+        }
+
+        body {
+            background: radial-gradient(1200px 600px at 10% -10%, rgba(122, 162, 255, .25), transparent),
+                radial-gradient(1200px 600px at 90% -20%, rgba(155, 89, 255, .22), transparent),
+                var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            margin: 0
+        }
+
+        .wrap {
+            max-width: 1040px;
+            margin: 36px auto;
+            padding: 0 20px
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 0;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .tools {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        input[type="file"] {
+            display: none
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--btn);
+            cursor: pointer;
+            color: var(--text)
+        }
+
+        .btn:hover {
+            background: var(--btn-hover)
+        }
+
+        .btn:active {
+            transform: scale(.98)
+        }
+
+        .btn.primary {
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            border-color: transparent;
+            color: #fff
+        }
+
+        .btn.primary:hover {
+            filter: brightness(1.05)
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: var(--shadow)
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px
+        }
+
+        @media (min-width:980px) {
+            .grid {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 140px;
+            resize: vertical;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel);
+            color: var(--text);
+            font-size: 14px
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap
+        }
+
+        .sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 12px;
+            box-shadow: var(--shadow)
+        }
+
+        .card h2 {
+            font-size: 16px;
+            margin: 0 0 8px
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0
+        }
+
+        .tab {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--btn);
+            color: var(--text);
+            cursor: pointer
+        }
+
+        .tab.active {
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            color: #fff;
+            border-color: transparent
+        }
+
+        .view {
+            display: none
+        }
+
+        .view.show {
+            display: block
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: 0;
+            font-family: Consolas, Monaco, monospace;
+            max-height: 360px;
+            overflow: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, .04);
+            border-radius: 10px
+        }
+
+        .chip {
+            display: inline-block;
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            margin-right: 6px;
+            color: var(--muted)
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 12px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, .2);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s
+        }
+
+        .toast.show {
+            opacity: 1
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="header">
+            <div>
+                <h1>UTF-8 二进制转换工具</h1>
+                <div class="subtitle">实时转换、复制、统计，一页搞定</div>
+            </div>
+            <div class="tools">
+                <label class="btn" for="file">从文件读取</label>
+                <input id="file" type="file" accept="text/*">
+                <button class="btn" id="theme">切换主题</button>
+            </div>
+        </div>
+        <div class="panel">
+            <textarea id="input" placeholder="在此输入文本"></textarea>
+            <div class="actions">
+                <button class="btn" id="clear">清空</button>
+                <button class="btn primary" id="copySpaced">复制带空格</button>
+                <button class="btn primary" id="copyCompact">复制无空格</button>
+            </div>
+            <div class="sub" id="stats"></div>
+        </div>
+        <div class="card" style="margin-top:14px">
+            <div class="tabs">
+                <button class="tab active" data-tab="spaced">按字符分组</button>
+                <button class="tab" data-tab="compact">连续 01</button>
+                <button class="tab" data-tab="bychar">逐字分行</button>
+                <button class="tab" data-tab="hex">十六进制</button>
+            </div>
+            <div class="views">
+                <div id="view-spaced" class="view show">
+                    <pre id="spaced"></pre>
+                    <div class="actions"><button class="btn primary copy" data-target="spaced">复制</button></div>
+                </div>
+                <div id="view-compact" class="view">
+                    <pre id="compact"></pre>
+                    <div class="actions"><button class="btn primary copy" data-target="compact">复制</button></div>
+                </div>
+                <div id="view-bychar" class="view">
+                    <pre id="bychar"></pre>
+                    <div class="actions"><button class="btn primary copy" data-target="bychar">复制</button></div>
+                </div>
+                <div id="view-hex" class="view">
+                    <pre id="hex"></pre>
+                    <div class="actions"><button class="btn primary copy" data-target="hex">复制</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="toast" id="toast">已复制</div>
+    <script>
+        const enc = new TextEncoder();
+        function convert(s) { const charBins = [], bitsAll = [], charHex = []; for (const ch of s) { const bytes = enc.encode(ch); const bits = Array.from(bytes).map(b => b.toString(2).padStart(8, '0')); const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')); charBins.push(bits.join(' ')); bitsAll.push(...bits); charHex.push(hex.join(' ')) } return { spaced: charBins.join(' '), compact: bitsAll.join(''), bychar: charBins.join('\n'), hex: charHex.join(' ') } }
+        function update() { const t = document.getElementById('input').value || ''; const r = convert(t); document.getElementById('spaced').textContent = r.spaced; document.getElementById('compact').textContent = r.compact; document.getElementById('bychar').textContent = r.bychar; document.getElementById('hex').textContent = r.hex; const bytes = enc.encode(t); document.getElementById('stats').innerHTML = `<span class=\"chip\">字符 ${[...t].length}</span><span class=\"chip\">字节 ${bytes.length}</span><span class=\"chip\">位数 ${bytes.length * 8}</span>` }
+        function toast() { const el = document.getElementById('toast'); el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 1200) }
+        document.getElementById('input').addEventListener('input', update);
+        document.getElementById('clear').addEventListener('click', () => { document.getElementById('input').value = ''; update() });
+        document.querySelectorAll('.copy').forEach(btn => btn.addEventListener('click', async () => { const id = btn.getAttribute('data-target'); const v = document.getElementById(id).textContent; if (navigator.clipboard && v) { await navigator.clipboard.writeText(v); toast() } }));
+        document.getElementById('file').addEventListener('change', e => { const f = e.target.files && e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { document.getElementById('input').value = r.result; update() }; r.readAsText(f) });
+        document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); t.classList.add('active'); const key = t.getAttribute('data-tab'); document.querySelectorAll('.view').forEach(v => v.classList.remove('show')); document.getElementById('view-' + key).classList.add('show') }));
+        const themeBtn = document.getElementById('theme');
+        const saved = localStorage.getItem('theme'); if (saved) { document.body.dataset.theme = saved }
+        themeBtn.addEventListener('click', () => { const cur = localStorage.getItem('theme') || 'light'; const next = cur === 'light' ? 'dark' : 'light'; localStorage.setItem('theme', next); document.body.dataset.theme = next });
+        update()
+    </script>
+</body>
+
+</html>

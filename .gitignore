@@ -1,0 +1,17 @@
+node_modules/
+dist/
+server/node_modules/
+server/dist/
+server/node.exe
+
+# Local data and logs
+server/data/
+server/server/data/
+server/backups/
+*.log
+server/server/ops.log
+server/server/backup.log
+
+# Env files
+.env
+server/.env
