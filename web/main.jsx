@@ -71,8 +71,12 @@ function App() {
   const [targetAccountId, setTargetAccountId] = useState('')
   const [manageMsg, setManageMsg] = useState('')
   const [manageLoading, setManageLoading] = useState(false)
+  const [syncStatus, setSyncStatus] = useState({ enabled: false, intervalMs: 300000, lastSaveAt: 0, lastPullAt: 0, running: false, progress: '', logs: [] })
+  const [intervalMs, setIntervalMs] = useState(300000)
+  const [syncMsg, setSyncMsg] = useState('')
 
   useEffect(() => { api.me().then(u => u && setUser(u)) }, [])
+  useEffect(() => { if (user) fetch('/api/sync/status', { credentials: 'include' }).then(r => r.json()).then(s => { setSyncStatus(s); setIntervalMs(s.intervalMs || 300000) }) }, [user])
   useEffect(() => { if (user) api.getCategories().then(setCategories) }, [user])
   useEffect(() => { if (!targetCategoryId) { setTargetAccounts([]); setTargetAccountId(''); return } api.getAccounts(targetCategoryId).then(setTargetAccounts) }, [targetCategoryId])
   useEffect(() => {
@@ -208,6 +212,54 @@ function App() {
             <button onClick={() => {
               const input = document.createElement('input'); input.type = 'file'; input.accept = '.json'; input.onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { const records = JSON.parse(t); fetch('/api/import', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ records, onDuplicate: 'merge' }) }).then(r => r.json()).then(() => statsFetch()) }) }; input.click()
             }}>导入</button>
+            
+            <div style={{ borderTop: '1px solid var(--border)', marginTop: 8, paddingTop: 8, display: 'grid', gap: 8 }}>
+              <div className="row">
+                <label>
+                  <span>自动存储</span>
+                  <select className="select" value={syncStatus.enabled ? 'on' : 'off'} onChange={e => {
+                    const en = e.target.value === 'on'
+                    fetch('/api/sync/config', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: en, intervalMs }) })
+                      .then(r => r.json()).then(s => { setSyncStatus(s); setSyncMsg('已更新自动存储') })
+                  }}>
+                    <option value="off">关闭</option>
+                    <option value="on">开启</option>
+                  </select>
+                </label>
+                <label>
+                  <span>时间间隔(ms)</span>
+                  <input type="number" value={intervalMs} onChange={e => setIntervalMs(Number(e.target.value))} />
+                  <button onClick={() => {
+                    fetch('/api/sync/config', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ enabled: syncStatus.enabled, intervalMs }) })
+                      .then(r => r.json()).then(s => { setSyncStatus(s); setSyncMsg('已更新间隔') })
+                  }}>保存配置</button>
+                </label>
+                <button onClick={() => {
+                  if (!confirm('确认立即保存到云端？')) return
+                  setSyncMsg('')
+                  fetch('/api/sync/save', { method: 'POST', credentials: 'include' })
+                    .then(r => r.json()).then(s => { setSyncStatus(s); setSyncMsg('已保存到云端') })
+                    .catch(e => setSyncMsg(String(e.message || e)))
+                }}>立即存储</button>
+                <button onClick={() => {
+                  setSyncMsg('')
+                  fetch('/api/sync/pull', { method: 'POST', credentials: 'include' })
+                    .then(r => r.json()).then(s => { setSyncStatus(s); setSyncMsg('已从云端拉取并合并'); statsFetch() })
+                    .catch(e => setSyncMsg(String(e.message || e)))
+                }}>立即同步</button>
+              </div>
+              <div style={{ fontSize: 12, color: 'gray' }}>
+                <div>状态：{syncStatus.running ? '进行中' : '空闲'} {syncStatus.progress || ''}</div>
+                <div>上次保存：{syncStatus.lastSaveAt ? new Date(syncStatus.lastSaveAt).toLocaleString() : '-'}</div>
+                <div>上次拉取：{syncStatus.lastPullAt ? new Date(syncStatus.lastPullAt).toLocaleString() : '-'}</div>
+                {syncMsg && <div style={{ color: 'teal' }}>{syncMsg}</div>}
+              </div>
+              <div style={{ maxHeight: 120, overflow: 'auto', border: '1px dashed var(--border)', borderRadius: 6, padding: 6 }}>
+                {(syncStatus.logs || []).slice().reverse().map((l, i) => (
+                  <div key={i} style={{ fontSize: 12 }}>{new Date(l.t).toLocaleString()} {l.msg}</div>
+                ))}
+              </div>
+            </div>
           </div>
           {manageOpen && (
             <div style={{ marginTop: 8 }}>

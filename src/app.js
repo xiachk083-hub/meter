@@ -32,6 +32,7 @@ import {
 } from './db.js'
 import crypto from 'crypto'
 import xlsx from 'xlsx'
+import { getStatus as getSyncStatus, setConfig as setSyncConfig, saveAll as saveCloud, pullAll as pullCloud, queueChange } from './cloud.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -124,6 +125,7 @@ app.post('/api/categories', requireAuth, (req, res) => {
   const { name } = req.body
   try {
     const id = createCategoryForUser(req.user.id, name)
+    queueChange({ type: 'category_create', userId: req.user.id, id })
     res.json({ id })
   } catch (e) {
     res.status(400).json({ error: String(e.message || e) })
@@ -152,6 +154,7 @@ app.post('/api/accounts', requireAuth, (req, res) => {
   const { categoryId, name } = req.body
   try {
     const id = createAccountForUser(req.user.id, Number(categoryId), name)
+    queueChange({ type: 'account_create', userId: req.user.id, id })
     res.json({ id })
   } catch (e) {
     res.status(400).json({ error: String(e.message || e) })
@@ -169,6 +172,7 @@ app.post('/api/sessions/start', requireAuth, (req, res) => {
     const existing = getActiveSessionForUser(req.user.id, categoryId, accountId)
     if (existing) return res.json({ id: existing.id })
     const id = startSessionForUser(req.user.id, { categoryId, accountId, hourlyRate })
+    queueChange({ type: 'start', userId: req.user.id, id })
     res.json({ id })
   } catch (e) {
     res.status(400).json({ error: String(e.message || e) })
@@ -178,18 +182,21 @@ app.post('/api/sessions/start', requireAuth, (req, res) => {
 app.post('/api/sessions/pause', requireAuth, (req, res) => {
   const { sessionId } = req.body
   const ok = pauseSession(Number(sessionId))
+  queueChange({ type: 'pause', userId: req.user.id, id: Number(sessionId) })
   res.json({ ok })
 })
 
 app.post('/api/sessions/resume', requireAuth, (req, res) => {
   const { sessionId } = req.body
   const ok = resumeSession(Number(sessionId))
+  queueChange({ type: 'resume', userId: req.user.id, id: Number(sessionId) })
   res.json({ ok })
 })
 
 app.post('/api/sessions/stop', requireAuth, (req, res) => {
   const { sessionId } = req.body
   const r = stopSession(Number(sessionId))
+  queueChange({ type: 'stop', userId: req.user.id, id: Number(sessionId) })
   res.json(r)
 })
 
@@ -318,6 +325,7 @@ app.post('/api/sessions/batch/update', requireAuth, (req, res) => {
   if (!Array.isArray(ids) || !ids.length) return res.status(400).json({ error: 'ids_required' })
   try {
     const r = updateSessionsForUser(req.user.id, ids, { categoryId, accountId }, { admin: isAdmin(req) && scope === 'global' })
+    queueChange({ type: 'batch_update', ids, userId: req.user.id })
     res.json(r)
   } catch (e) {
     res.status(400).json({ error: String(e.message || e) })
@@ -328,7 +336,26 @@ app.post('/api/sessions/batch/delete', requireAuth, (req, res) => {
   const { ids, scope } = req.body
   if (!Array.isArray(ids) || !ids.length) return res.status(400).json({ error: 'ids_required' })
   const r = deleteSessionsForUser(req.user.id, ids, { admin: isAdmin(req) && scope === 'global' })
+  queueChange({ type: 'batch_delete', ids, userId: req.user.id })
   res.json(r)
+})
+
+app.get('/api/sync/status', requireAuth, (req, res) => {
+  res.json(getSyncStatus())
+})
+
+app.post('/api/sync/config', requireAuth, (req, res) => {
+  const { enabled, intervalMs } = req.body
+  setSyncConfig({ enabled, intervalMs })
+  res.json(getSyncStatus())
+})
+
+app.post('/api/sync/save', requireAuth, async (req, res) => {
+  try { await saveCloud(); res.json(getSyncStatus()) } catch (e) { res.status(500).json({ error: String(e.message || e) }) }
+})
+
+app.post('/api/sync/pull', requireAuth, async (req, res) => {
+  try { await pullCloud(); res.json(getSyncStatus()) } catch (e) { res.status(500).json({ error: String(e.message || e) }) }
 })
 
 function firstExisting(paths) {
