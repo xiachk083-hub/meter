@@ -333,4 +333,9 @@ app.post('/api/sessions/batch/delete', requireAuth, (req, res) => {
 const staticDir = (global.process && global.process.pkg) ? path.join(path.dirname(process.execPath), 'public') : path.resolve(__dirname, '../public')
 app.use(express.static(staticDir))
 
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next()
+  res.sendFile(path.join(staticDir, 'index.html'))
+})
+
 export default app
